@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/vue.global.js"></script>
+    <script src="js/packer.js"></script>
+    <script src="js/packer.growing.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            width: 100vw;
+            height: 5vh;
+            border: 1px solid red;
+            text-align: center;
+        }
+
+        .container {
+            width: 100vw;
+            height: 95vh;
+            display: flex;
+        }
+
+        .left {
+            flex-shrink: 0;
+            flex-grow: 0;
+            width: 20vw;
+            height: auto;
+            box-sizing: border-box;
+            padding: 0 1vw;
+        }
+
+        .right {
+            width: 100%;
+            height: 100%;
+            background: whitesmoke;
+            overflow: scroll;
+        }
+
+        canvas {
+            box-sizing: border-box;
+            border: 3px solid orange;
+        }
+
+        .side-content {
+            height: 50vh;
+            overflow-y: scroll;
+            border: 1px solid gray;
+            box-sizing: border-box;
+        }
+
+        pre {
+            max-height: 10vh;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header>
+        雪碧图制作工具
+        <div>填充度:<span style="color:red;">{{ratio ? ratio : '未知'}}</span>%</div>
+    </header>
+    <div class="container">
+        <div class="left">
+            <div class="side-menu">
+                <h5>画布尺寸设置:</h5>
+                <!--    画布大小-->
+                <div>
+                    <label for="cw">宽:</label>
+                    <input style="width: 50px;" id="cw" type="number" v-model="cWidth" :disabled="sizeAuto">
+                    <label for="ch">高:</label>
+                    <input style="width: 50px;" id="ch" type="number" v-model="cHeight" :disabled="sizeAuto">
+                    <br>
+                    <label for="sizeAutoCheck">自动尺寸</label>
+                    <input id="sizeAutoCheck" type="checkbox" v-model="sizeAuto">
+                </div>
+                <hr>
+                <!--排序-->
+                <h5>排序设置:</h5>
+                <div class='sort'>
+                    <label for='sort'>排序依据:</label>
+                    <select id='sort' v-model="sortCur">
+                        <option>宽度</option>
+                        <option>高度</option>
+                        <option>面积</option>
+                        <option>随机</option>
+                    </select>
+                    <button v-show="sortCur == '随机'" @click="run">运行</button>
+                </div>
+                <hr>
+                <h5>上传图片详情:</h5>
+                <!--        内容-->
+                <div class="side-content">
+                    <ol>
+                        <li v-for="(item,i) in blocks" :key="i">
+                            <span style="font-size: 8px;">{{item.name}}</span><br>宽:{{item.w}},高:{{item.h}}<br>{{(item.size / 1024).toFixed(2)}}
+                            KB<br>
+                        </li>
+                    </ol>
+                </div>
+                <div v-show="noFit.length>0">{{noFit}}</div>
+
+            </div>
+        </div>
+        <div class="right">
+            <canvas id="canvas" :width="cWidth" :height="cHeight" @dragover.prevent
+                    @drop.prevent="dropImg">
+                你的浏览器不支持canvas
+            </canvas>
+            <hr>
+            <h3>生成css</h3>
+            <pre id="exportCss"></pre>
+            <input type="text" v-model="cssName">
+            <a id="downCss" href="" :download="cssName+'.css'">下载Css</a>
+            <hr>
+            <h3>生成hotspot xml</h3>
+            <pre id="exportXml"></pre>
+            <input type="text" v-model="xmlName">
+            <a id="downXml" href="" :download="xmlName+'.xml'">下载xml</a>
+            <hr>
+            <h3>下载图片</h3>
+            <label for="downImg">图片名称:</label>
+            <input id="downImg" type="text" v-model="imgName">
+            <select name="" id="" v-model="imgExt">
+                <option value=".png" selected>png</option>
+                <option value=".jpg">jpg</option>
+            </select>
+            <br>
+            <img id="preImg" src="" alt="">
+            <a id="downloadImage" href="" :download="imgName+imgExt">下载图片</a>
+            <hr>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/main.js"></script>
+</html>
